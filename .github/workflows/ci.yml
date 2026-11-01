@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: JS 语法
+        run: node --check app.js
+
+      - name: 静态引用一致（html 里引用的本地文件必须存在）
+        run: |
+          python3 - <<'PY'
+          import re, sys
+          from pathlib import Path
+          html = Path('index.html').read_text(encoding='utf-8')
+          refs = re.findall(r'(?:href|src)="([^"#:]+)"', html)
+          missing = [r for r in refs if not Path(r).is_file()]
+          print('引用的本地文件:', refs)
+          if missing:
+              print('缺失:', missing)
+              sys.exit(1)
+          PY

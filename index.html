@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>风控运营台 · Risk Control Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot" aria-hidden="true"></span>
+      <h1>风控运营台</h1>
+      <span class="tag">risk-control-platform</span>
+    </div>
+    <div class="config">
+      <label for="apiBase">网关地址</label>
+      <input id="apiBase" type="text" spellcheck="false" placeholder="http://localhost:8080">
+      <button id="saveBase" class="ghost" type="button">保存</button>
+      <button id="loadDomains" class="ghost" type="button">探测巡查线</button>
+      <span id="connState" class="state">未连接</span>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>提交巡查事件</h2>
+        <span class="hint">POST /api/v1/patrol/dispatch</span>
+      </div>
+      <form id="dispatchForm">
+        <div class="row">
+          <label>巡查线
+            <select id="domain"></select>
+          </label>
+          <label>事件 ID
+            <input id="eventId" value="job:1001" spellcheck="false">
+          </label>
+          <label>版本
+            <input id="version" type="number" min="1" value="1">
+          </label>
+        </div>
+        <label class="block">payload <span class="hint">（网关原样转发给巡查线）</span>
+          <textarea id="payload" rows="14" spellcheck="false"></textarea>
+        </label>
+        <div class="actions">
+          <button type="submit">提交派发</button>
+          <button type="button" id="replayBtn" class="ghost">重放同版本</button>
+          <button type="button" id="bumpBtn" class="ghost">版本 +1</button>
+        </div>
+        <p class="note">重放同版本应被幂等拒绝；版本 +1 才应产生新裁决。</p>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>裁决结果</h2>
+        <span id="elapsed" class="hint"></span>
+      </div>
+      <div id="result" class="result empty">尚未提交事件</div>
+    </section>
+  </main>
+
+  <section class="panel wide">
+    <div class="panel-head">
+      <h2>本次会话记录</h2>
+      <button id="clearHistory" class="ghost small" type="button">清空</button>
+    </div>
+    <table class="history">
+      <thead>
+      <tr><th>时间</th><th>事件</th><th>巡查线</th><th>版本</th><th>决策</th><th>分数</th><th>说明</th></tr>
+      </thead>
+      <tbody id="historyBody">
+      <tr><td colspan="7" class="muted">暂无记录</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer class="footer">
+    <span>前端只经 <code>api-gateway</code> 访问后端，不直连任何巡查线（红线 RL-002）。</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
